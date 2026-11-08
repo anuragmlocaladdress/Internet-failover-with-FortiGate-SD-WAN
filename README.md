@@ -21,7 +21,8 @@ Solution Architect - IT & Security | Hyderabad, India
 
 ## 🗺️ Lab Topology
 
-![Lab Topology](images/01-topology.png)
+<img width="701" height="298" alt="image" src="https://github.com/user-attachments/assets/317a1b9f-9d35-4b68-8b7d-ff124afd07cd" />
+
 *Two ISP routers peer with eBGP to simulate the internet. HQ FortiGate connects to both ISPs and uses SD-WAN to choose the healthy link.*
 
 > 💡 **Overview:** HQ users reach the internet through **ISP1 (primary)**. When ISP1 fails — or stays up but stops reaching the internet — FortiGate SD-WAN moves traffic to **ISP2 (backup)** automatically, without any manual change.
@@ -330,12 +331,15 @@ write memory
 | port3 | TO-HQ_SW | LAN | 172.16.100.1/30 | PING only |
 | port4 | MGMT | LAN | 172.16.16.100/24 | HTTPS, SSH, PING |
 
-![Interfaces](images/02-interfaces.png)
+<img width="1695" height="688" alt="image" src="https://github.com/user-attachments/assets/a1c92898-c40b-4a97-a786-1145ed7c921c" />
+
 *FortiGate interfaces with aliases and roles.*
 
 > ⚠️ Never enable HTTPS/SSH/FMG-Access on WAN ports. Management stays on the dedicated port4.
 
 ### Step 3.2 — Static routes to the HQ VLANs (Network → Static Routes)
+<img width="1880" height="490" alt="image" src="https://github.com/user-attachments/assets/e7df5baa-2812-47ed-951f-f36d9697bcce" />
+
 
 | Destination | Gateway | Interface |
 |---|---|---|
@@ -344,7 +348,8 @@ write memory
 
 > ⚠️ Always set the **gateway** on routes to networks behind another router. Without it, the route shows "directly connected" and only works by accident through proxy ARP.
 
-![Static Routes](images/03-static-routes.png)
+<img width="1880" height="490" alt="image" src="https://github.com/user-attachments/assets/2b7bbe8e-6cfc-4851-894f-a544dc4729e3" />
+
 *Routes to the HQ VLANs and the SD-WAN default route.*
 
 ---
@@ -362,7 +367,8 @@ Create a zone named **`UNDERLAY`** (leave members empty), then create the member
 | WAN1-ISP1 (port1) | UNDERLAY | 198.51.100.1 | 0 (primary) |
 | WAN2-ISP2 (port2) | UNDERLAY | 203.0.113.1 | 10 (backup) |
 
-![SD-WAN Zone](images/04-sdwan-zone.png)
+<img width="1694" height="688" alt="image" src="https://github.com/user-attachments/assets/a6c1a94a-fee4-4662-b2c7-f0b3acb7391d" />
+
 *UNDERLAY zone with both ISP members.*
 
 > 💡 **Why a custom zone?** Policies use zones, not members. A separate `UNDERLAY` zone (internet) and, later, an `OVERLAY` zone (VPN tunnels) allow NAT on internet traffic and no NAT on VPN traffic.
@@ -382,6 +388,9 @@ Member(2): interface: port2, flags=0x0 , gateway: 203.0.113.1, priority: 0 1024,
 ### Step 5.1 — Default route
 
 Network → Static Routes → Create New: Destination `0.0.0.0/0.0.0.0`, Interface **UNDERLAY**.
+
+<img width="1153" height="591" alt="image" src="https://github.com/user-attachments/assets/6bdc5701-c38c-47a4-b567-82fb853821b6" />
+
 
 ```
 HQ_FW # get router info routing-table all
@@ -407,7 +416,8 @@ S       10.10.101.0/24 [10/0] via 172.16.100.2, port3
 | Restore link after | 5 (anti-flapping) |
 | Update static route | Enabled |
 
-![Performance SLA](images/05-performance-sla.png)
+<img width="1011" height="785" alt="image" src="https://github.com/user-attachments/assets/fc221413-a864-4a9a-9d2c-7d6e289396ad" />
+
 *Health check probing both ISPs.*
 
 ```
@@ -428,7 +438,8 @@ Seq(2 port2): state(alive), packet-loss(0.000%) latency(1.356), jitter(0.223) ..
 | Interface preference | WAN1-ISP1, WAN2-ISP2 |
 | Required SLA target | SLA#1 |
 
-![SD-WAN Rule](images/06-sdwan-rule.png)
+<img width="1207" height="917" alt="image" src="https://github.com/user-attachments/assets/12d39ef8-5e65-4cf3-8f74-967865733572" />
+
 *Lowest Cost (SLA): use the cheapest link that meets the SLA.*
 
 ```
@@ -462,7 +473,8 @@ Service(1): Address Mode(IPV4) flags=0x200 use-shortcut-sla
 | NAT | Enabled — Use Outgoing Interface Address |
 | Log allowed traffic | All Sessions |
 
-![Firewall Policy](images/07-firewall-policy.png)
+<img width="1200" height="948" alt="image" src="https://github.com/user-attachments/assets/839093c2-16c4-4b83-8e26-a9393fc51d1e" />
+
 *One policy to the zone covers both ISPs.*
 
 > 💡 With **Use Outgoing Interface Address**, the NAT IP follows the ISP that SD-WAN selects — 198.51.100.2 on ISP1, 203.0.113.2 on ISP2 — so the source IP always belongs to the ISP carrying the packet and passes the ISP's uRPF check.
